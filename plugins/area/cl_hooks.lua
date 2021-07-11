@@ -205,6 +205,22 @@ function PLUGIN:OnAreaChanged(oldID, newID)
 	self.panel:AddEntry(format, area.properties.color)
 end
 
+function PLUGIN:OnAreaLeft(id)
+	local client = LocalPlayer()
+	client.ixArea = ""
+	client.ixInArea = false
+end
+
+function PLUGIN:ShouldDisplayArea(newID)
+	local client = LocalPlayer()
+
+	if (client.ixOldArea == newID) then
+		return false
+	end
+
+	client.ixOldArea = newID
+end
+
 net.Receive("ixAreaEditStart", function()
 	PLUGIN:StartEditing()
 end)
@@ -255,4 +271,10 @@ net.Receive("ixAreaChanged", function()
 	local oldID, newID = net.ReadString(), net.ReadString()
 
 	hook.Run("OnAreaChanged", oldID, newID)
+end)
+
+net.Receive("ixAreaLeft", function()
+	local id = net.ReadString()
+
+	hook.Run("OnAreaLeft", id)
 end)
